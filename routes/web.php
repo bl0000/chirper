@@ -27,6 +27,8 @@ Route::resource('chirps', ChirpController::class)
     ->only(['index','store', 'edit', 'update', 'destroy'])
     ->middleware(['auth','auth']);
 
+Route::post('chirps/{chirp}/like', [ChirpController::class, 'like'])->name('chirps.like');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -89,4 +89,11 @@ class ChirpController extends Controller
 
         return redirect(route('chirps.index'));
     }
+    
+    public function like(Chirp $chirp)
+    {
+        $chirp->increment('likes');
+
+        return response()->json(['message' => 'Like successful', 'likes' => $chirp->likes]);
+    }
 }
