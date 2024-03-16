@@ -23,4 +23,9 @@ class Chirp extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function likedBy()
+    {
+        return $this->belongsToMany(User::class, 'chirp_user', 'chirp_id', 'user_id')->withTimestamps();
+    }
 }

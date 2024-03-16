@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use App\Models\Chirp;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class ChirpController extends Controller
 {
@@ -15,8 +17,14 @@ class ChirpController extends Controller
      */
     public function index(): View
     {
+        $user = Auth::user();
+        
+        // Pull all liked Chirps or return empty array
+        $likedChirps = $user ? $user->likedChirps->pluck('id')->toArray() : [];
+
         return view('chirps.index', [
             'chirps' => Chirp::with('user')->latest()->get(),
+            'likedChirps' => $likedChirps,
         ]);
     }
 
@@ -92,8 +100,18 @@ class ChirpController extends Controller
     
     public function like(Chirp $chirp)
     {
-        $chirp->increment('likes');
+        $user = auth()->user();
 
-        return response()->json(['message' => 'Like successful', 'likes' => $chirp->likes]);
+        $liked = $user->likedChirps()->where('chirp_id', $chirp->id)->exists();
+
+        if ($liked) {
+            $user->likedChirps()->detach($chirp->id); 
+            $chirp->decrement('likes');
+            return response()->json(['message' => 'Chirp unliked', 'likes' => $chirp->likes]);
+        } else {
+            $user->likedChirps()->attach($chirp->id); 
+            $chirp->increment('likes');
+            return response()->json(['message' => 'Chirp liked', 'likes' => $chirp->likes]);
+        }
     }
 }

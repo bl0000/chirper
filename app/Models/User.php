@@ -49,4 +49,8 @@ class User extends Authenticatable
         return $this->hasMany(Chirp::class);
     }
     
+    public function likedChirps()
+    {
+        return $this->belongsToMany(Chirp::class, 'chirp_user', 'user_id', 'chirp_id')->withTimestamps();
+    }
 }

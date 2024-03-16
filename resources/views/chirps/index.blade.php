@@ -54,7 +54,7 @@
 						<form id="likeForm-{{ $chirp->id }}" method="POST" action="{{ route('chirps.like', $chirp) }}" class="mt-1">
 							@csrf
 							<button type="button" onclick="submitForm({{ $chirp->id }})" class="flex items-center">
-								<svg id="likeIcon-{{ $chirp->id }}" class="h-5 w-5 text-gray-600 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+								<svg id="likeIcon-{{ $chirp->id }}" class="h-5 w-5 text-gray-600 -scale-x-100" fill="{{ in_array($chirp->id, $likedChirps) ? 'red' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
 									<path fill-rule="evenodd" clip-rule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
 								<span id="likeCount-{{ $chirp->id }}" class="text-black-500 ml-1">{{ $chirp->likes }}</span>
@@ -77,12 +77,16 @@
 								})
 								.then(response => {
 									if (!response.ok) {
-										throw new Error('Network response was not ok');
+										throw new Error('Network error');
 									}
-									// Change the SVG icon fill color to red
-									icon.setAttribute('fill', 'red');
-
-									likeCount.textContent = parseInt(likeCount.textContent) + 1;
+									// Toggle SVG icon fill color 
+									if (icon.getAttribute('fill') === 'red') {
+										icon.setAttribute('fill', 'none');
+										likeCount.textContent = parseInt(likeCount.textContent) - 1;	
+									} else {
+										icon.setAttribute('fill', 'red');
+										likeCount.textContent = parseInt(likeCount.textContent) + 1;
+									}
 								})
 								.catch(error => {
 									console.error('Error:', error);
